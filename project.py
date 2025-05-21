@@ -29,9 +29,12 @@ def download_playlist(playlist_url: str, out_dir: str) -> list[str]:
         info = ydl.extract_info(playlist_url, download=True)
         for entry in info.get("entries", []):
             # prepare_filename now yields .wav
-            fn = os.path.splitext(ydl.prepare_filename(entry))[0] + ".wav"
-            if os.path.exists(fn):
-                paths.append(fn)
+            try:
+                fn = os.path.splitext(ydl.prepare_filename(entry))[0] + ".wav"
+                if os.path.exists(fn):
+                    paths.append(fn)
+            except Exception as e:
+                continue
     return sorted(paths)
 
 
