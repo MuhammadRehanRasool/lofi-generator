@@ -12,6 +12,7 @@ from effects.config import FX_LISTS
 
 # from lofi_maker import slowedreverb
 from lofi_maker import slowedreverb_with_fx
+import shutil
 
 
 # DOWNLOAD PLAYLIST (as .wav)
@@ -42,6 +43,7 @@ def download_playlist(playlist_url: str, out_dir: str) -> list[str]:
                     paths.append(fn)
             except Exception as e:
                 continue
+    print(f"Downloaded {len(paths)} tracks to {out_dir}")
     return sorted(paths)
 
 
@@ -171,27 +173,38 @@ class LofiApp(tk.Tk):
         fx_scrollbar.pack(side="right", fill="y")
 
         self.fx_vars = []
+        info_label = tk.Label(
+            fx_scrollable_frame,
+            text="Tip: When you set value > 0, that effect is auto selected.",
+            fg="gray",
+            font=("Arial", 9, "italic"),
+            anchor="w",
+            justify="left",
+        )
+        info_label.grid(
+            row=0, column=0, columnspan=4, sticky="w", padx=10, pady=(5, 10)
+        )
         for idx, fx in enumerate(self.FX_LIST):
             tk.Label(fx_scrollable_frame, text=fx["name"]).grid(
-                row=idx, column=0, sticky="w", padx=10, pady=5
+                row=idx + 1, column=0, sticky="w", padx=10, pady=5
             )
             vol_var = DoubleVar(value=0.5)
             self.fx_vars.append(vol_var)
             entry = tk.Entry(
                 fx_scrollable_frame, textvariable=vol_var, width=6, justify="center"
             )
-            entry.grid(row=idx, column=1, padx=10)
+            entry.grid(row=idx + 1, column=1, padx=10)
             vol_var.set(0.0)
             play_btn = tk.Button(
                 fx_scrollable_frame,
                 text="▶",
                 command=lambda p=fx["path"], v=vol_var: self.play_effect(p, v),
             )
-            play_btn.grid(row=idx, column=2, padx=5)
+            play_btn.grid(row=idx + 1, column=2, padx=5)
             stop_btn = tk.Button(
                 fx_scrollable_frame, text="■", command=self.stop_effect
             )
-            stop_btn.grid(row=idx, column=3, padx=5)
+            stop_btn.grid(row=idx + 1, column=3, padx=5)
 
     def toggle_advanced(self):
         if self.advanced_frame.winfo_ismapped():
@@ -271,7 +284,8 @@ class LofiApp(tk.Tk):
 
     def _worker(self, url):
         self.progress.config(text="[Task# 1/3] Downloading playlist…")
-        tmpdir = tempfile.mkdtemp()
+        tmpdir = os.path.join(os.getcwd(), "tmpdir")
+        os.makedirs(tmpdir, exist_ok=True)
         files = download_playlist(url, tmpdir)
 
         out_folder = os.path.join(os.getcwd(), "output")
@@ -299,6 +313,10 @@ class LofiApp(tk.Tk):
             slowedreverb_with_fx(
                 filepath, f"LoFi {remove_extension(name)}.wav", out_folder, **params
             )
+        # Clear the "tmpdir" folder if it exists
+        tmpdir = os.path.join(os.getcwd(), "tmpdir")
+        if os.path.exists(tmpdir):
+            shutil.rmtree(tmpdir)
 
         self.progress.config(text="[Task# 3/3] All tracks done! Opening output folder…")
         self.go_btn.config(state="normal")

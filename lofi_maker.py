@@ -6,6 +6,12 @@ import soundfile as sf
 from pedalboard import Pedalboard, Reverb
 
 
+# Remove the file extension from a filename
+def remove_extension(filename: str) -> str:
+    """Remove the file extension from a filename."""
+    return os.path.splitext(filename)[0]
+
+
 def load_and_prep(effect_path, target_len, tmp_path, vol=1.0):
     """Load an effect file, convert to WAV/stereo, loop/trim to target_len, and apply volume."""
     # Convert to WAV if needed
@@ -66,7 +72,15 @@ def slowedreverb_with_fx(
     # Write output and clean up
     out_file = os.path.join(output_path, output_name)
     sf.write(out_file, out, sr_out)
-    for tmp in (TMP_IN, TMP_FX):
+
+    # Re-encode to compressed format
+    out_file_mp3 = os.path.join(output_path, remove_extension(output_name) + ".mp3")
+    cmd = (
+        f'ffmpeg -y -i "{out_file}" ' f"-codec:a libmp3lame -b:a 320k " f'"{out_file_mp3}"'
+    )
+    sp.call(cmd, shell=True)
+
+    for tmp in (TMP_IN, TMP_FX, out_file):
         try:
             os.remove(tmp)
         except Exception:
