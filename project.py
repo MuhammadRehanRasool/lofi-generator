@@ -283,10 +283,13 @@ class LofiApp(tk.Tk):
         threading.Thread(target=self._worker, args=(url,), daemon=True).start()
 
     def _worker(self, url):
-        self.progress.config(text="[Task# 1/3] Downloading playlist…")
+        # self.progress.config(text="[Task# 1/3] Downloading playlist…")
         tmpdir = os.path.join(os.getcwd(), "tmpdir")
         os.makedirs(tmpdir, exist_ok=True)
-        files = download_playlist(url, tmpdir)
+        # files = download_playlist(url, tmpdir)
+        # ['D:\\PROGRAMMING\\Tools\\lofi-generator\\tmpdir\\001_Sindhu Waadi.wav']
+        files = ['D:\\PROGRAMMING\\Tools\\lofi-generator\\tmpdir\\test.wav']  # For testing without downloading
+        
 
         out_folder = os.path.join(os.getcwd(), "output")
         os.makedirs(out_folder, exist_ok=True)

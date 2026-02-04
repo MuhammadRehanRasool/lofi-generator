@@ -1,5 +1,6 @@
 output/
 .env
+.venv
 env/
 *.cache
 .cache/
