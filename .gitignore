@@ -1,10 +1,39 @@
+# Generated audio / video
 output/
+backend/output/
+backend/temp/
+temp/
+*.mp4
+
+# Python
 .env
-.venv
+.venv/
+venv/
 env/
+__pycache__/
+*.pyc
 *.cache
 .cache/
-__pycache__/
 test/
+
+# Node
 node_modules/
+dist/
+dist-ssr/
 *.log
+
+# Model weights
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.safetensors
+*.bin
+
+# Audio: ignore by default, keep the bundled samples the apps load
+*.wav
+*.mp3
+!effects/*.wav
+!backend/effects/*.wav
+!client/assets/**/*.mp3
+!frontend/public/**/*.mp3
